@@ -30,6 +30,8 @@ Gem::Specification.new do |spec|
   end
   spec.require_paths = ["lib"]
 
+  spec.add_dependency "json"
   spec.add_dependency "lutaml-jsonschema", "~> 0.1.25"
   spec.add_dependency "lutaml-model", "~> 0.8.122"
+  spec.add_dependency "yeptris", "~> 0.6.34"
 end
