@@ -63,8 +63,10 @@ RSpec.describe Lutaml::Openapi::Document do
   end
 
   describe "the OGC API - Features corpus (done-when, PLAN.md M1)" do
-    %w[ogcapi-features-1-oas31.yaml ogcapi-features-1-oas30.yaml
-       ogcapi-records-1-building-blocks.yaml ogcapi-tiles-1-bundled.json].each do |tag|
+    corpus = %w[ogcapi-features-1-oas31.yaml ogcapi-features-1-oas30.yaml
+                ogcapi-records-1-building-blocks.yaml
+                ogcapi-tiles-1-bundled.json]
+    corpus.each do |tag|
       it "round-trips ogcapi-features-1-#{tag} losslessly" do
         source = fixture(tag)
         original = Lutaml::Openapi.parse_raw(source)
