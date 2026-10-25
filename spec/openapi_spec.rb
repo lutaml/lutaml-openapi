@@ -24,7 +24,10 @@ RSpec.describe Lutaml::Openapi::Document do
   end
 
   def hash_pair?(expected, actual)
-    return false unless actual.is_a?(Hash) && expected.keys == actual.keys
+    # key order is not semantic (lutaml-model emits in mapping order —
+    # semantically lossless, not byte-identical, per #993's law)
+    return false unless actual.is_a?(Hash) &&
+      expected.keys.sort == actual.keys.sort
 
     expected.all? { |key, value| deep_match?(value, actual[key]) }
   end
@@ -60,9 +63,10 @@ RSpec.describe Lutaml::Openapi::Document do
   end
 
   describe "the OGC API - Features corpus (done-when, PLAN.md M1)" do
-    %w[oas31 oas30].each do |tag|
+    %w[ogcapi-features-1-oas31.yaml ogcapi-features-1-oas30.yaml
+       ogcapi-records-1-building-blocks.yaml ogcapi-tiles-1-bundled.json].each do |tag|
       it "round-trips ogcapi-features-1-#{tag} losslessly" do
-        source = fixture("ogcapi-features-1-#{tag}.yaml")
+        source = fixture(tag)
         original = Lutaml::Openapi.parse_raw(source)
 
         doc = Lutaml::Openapi.parse(source)
