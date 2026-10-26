@@ -15,6 +15,7 @@ module Lutaml
   # Anything unmodeled rides the extensions catch-all — documents
   # round-trip verbatim.
   module Openapi
+    autoload :CorpusAudit, "lutaml/openapi/corpus_audit"
     autoload :VERSION, "lutaml/openapi/version"
     autoload :Document, "lutaml/openapi/document"
     autoload :Oas30, "lutaml/openapi/oas30"
