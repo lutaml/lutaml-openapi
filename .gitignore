@@ -18,3 +18,7 @@
 
 # Ruby
 Gemfile.lock
+
+# SPA build output (built at release time only)
+frontend/dist/
+frontend/node_modules/
