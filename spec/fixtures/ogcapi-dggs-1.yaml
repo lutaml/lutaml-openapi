@@ -1,0 +1,220 @@
+openapi: 3.0.0
+info:
+  version: '1.0'
+  title: OGC API - Discrete Global Grid Systems
+  description: 'Example API Definition for OGC API - DGGS - Part 1: Core'
+  contact:
+    name: Open Geospatial Consortium
+    email: info@ogc.org
+  license:
+    name: OGC License
+    url: http://www.opengeospatial.org/legal/
+servers:
+- description: Example OGC API - DGGS server
+  url: https://maps.gnosis.earth/ogcapi
+paths:
+  /:
+    $ref: paths/common-core/pLandingPage.yaml
+  /conformance:
+    $ref: paths/common-core/pConformance.yaml
+  /api:
+    $ref: paths/common-core/pAPI.yaml
+  /api/all-collections:
+    $ref: paths/dynamic/pAllCollections.yaml
+  /api/dggs:
+    $ref: paths/dynamic/pDGGRS.yaml
+  /collections:
+    $ref: paths/common-geodata/pCollectionsList.yaml
+  /collections/{collectionId}:
+    $ref: paths/common-geodata/pCollection.yaml
+  /dggs:
+    $ref: paths/dggs-core/pDGGRSList.yaml
+  /dggs/{dggrsId}:
+    $ref: paths/dggs-core/pDGGRS.yaml
+  /dggs/{dggrsId}/zones/{zoneId}:
+    $ref: paths/dggs-core/pZone.yaml
+  /collections/{collectionId}/dggs:
+    $ref: paths/dggs-core/pCollectionDGGRSList.yaml
+  /collections/{collectionId}/dggs/{dggrsId}:
+    $ref: paths/dggs-core/pCollectionDGGRS.yaml
+  /collections/{collectionId}/dggs/{dggrsId}/zones/{zoneId}:
+    $ref: paths/dggs-core/pCollectionZone.yaml
+  /dggs/{dggrsId}/zones/{zoneId}/data:
+    $ref: paths/dggs-core/pZoneData.yaml
+  /collections/{collectionId}/dggs/{dggrsId}/zones/{zoneId}/data:
+    $ref: paths/dggs-core/pCollectionZoneData.yaml
+  /dggs/{dggrsId}/zones:
+    $ref: paths/dggs-core/pZones.yaml
+  /collections/{collectionId}/dggs/{dggrsId}/zones:
+    $ref: paths/dggs-core/pCollectionZones.yaml
+components:
+  schemas:
+    confClasses:
+      $ref: schemas/common-core/confClasses.yaml
+      description: The conformance classes the deployment implements, per the OGC API conformance declaration.
+    link:
+      $ref: schemas/common-core/link.yaml
+      description: A hyperlink with its relation type, per the OGC API link conventions.
+    landingPage:
+      $ref: schemas/common-core/landingPage.yaml
+      description: 'The landing page of the API: links to the conformance declaration, collections and
+        other resources.'
+    exception:
+      $ref: schemas/common-core/exception.yaml
+      description: An exception report describing why a request failed, per the OGC API exception convention.
+    collections:
+      $ref: schemas/common-geodata/collections.yaml
+      description: A list of the collections available on this API, with their titles, descriptions and
+        links.
+    collectionDesc:
+      $ref: schemas/common-geodata/collectionDesc.yaml
+      description: A description of a collection hosting DGGS data.
+    grid:
+      $ref: schemas/common-geodata/grid.yaml
+      description: 'A grid refinement of a DGGRS: the set of zones at a given refinement level intersecting
+        the query area.'
+    regularGrid:
+      $ref: schemas/common-geodata/regularGrid.yaml
+      description: A regular DGGS grid whose zones are uniform in shape and area at a given level.
+    irregularGrid:
+      $ref: schemas/common-geodata/irregularGrid.yaml
+      description: An irregular DGGS grid whose zones vary in shape or area at a given level.
+    extent:
+      $ref: schemas/common-geodata/extent.yaml
+      description: The spatial and temporal extent of a collection or deployment.
+    dataType:
+      $ref: schemas/common-geodata/dataType.yaml
+      description: A data type declaration for an input or output value.
+    timeStamp:
+      $ref: schemas/common-geodata/timeStamp.yaml
+      description: The timestamp of the response, per RFC 3339.
+    numberReturned:
+      $ref: schemas/common-geodata/numberReturned.yaml
+      description: The number of items returned in this response.
+    numberMatched:
+      $ref: schemas/common-geodata/numberMatched.yaml
+      description: The number of items matching the selection criteria, if the server can determine it.
+    role:
+      $ref: schemas/records-core/roles.yaml
+      description: The role performed by a contact in relation to the DGGS dataset.
+    dggrs:
+      $ref: schemas/dggs-core/dggrs.yaml
+      description: 'A Discrete Global Grid Reference System: the hierarchical grid used to organize and
+        query the data.'
+    dggrs-item:
+      $ref: schemas/dggs-core/dggrs-item.yaml
+      description: 'A subset of a DGGRS definition: identifier and URI.'
+    zone-info:
+      $ref: schemas/dggs-core/zone-info.yaml
+      description: 'Information about a DGGS zone: its identifier, geometry, refinement level and data
+        values.'
+    crs:
+      $ref: schemas/dggs-core/crs.yaml
+      description: The coordinate reference systems supported for spatial inputs and outputs.
+    dggrs-definition:
+      $ref: ../core/schemas/dggrs-definition/dggrs-definition-proposed.yaml
+      description: 'The full definition of a DGGRS: its geometry, level counts, cell shapes and parent-child
+        relations.'
+    dggs-json:
+      $ref: ../core/schemas/dggs-json/dggs-json.yaml
+      description: 'A DGGS data container: zones with their values serialized in the DGGS-JSON encoding.'
+    FeatureCollection:
+      $ref: schemas/geojson/FeatureCollection.yaml
+      description: 'A collection of DGGS features: zones with their data, serialized as GeoJSON.'
+    enumeration:
+      $ref: schemas/dynamic/enumeration.yaml
+      description: An input whose value must be one of an enumerated set of literals.
+    all-collections:
+      $ref: schemas/dynamic/all-collections.yaml
+      description: A list of all collections available on this API, across all collection types.
+    all-dggrs:
+      $ref: schemas/dynamic/all-dggrs.yaml
+      description: A list of all Discrete Global Grid Reference Systems (DGGRS) supported by this API.
+  parameters:
+    f-metadata:
+      $ref: parameters/unspecified/f-metadata.yaml
+    offset:
+      $ref: parameters/unspecified/offset.yaml
+    collectionId-all:
+      $ref: parameters/common-geodata/collectionId-all.yaml
+    collections:
+      $ref: parameters/common-geodata/collections.yaml
+    datetime:
+      $ref: parameters/common-geodata/datetime.yaml
+    bbox:
+      $ref: parameters/common-geodata/bbox.yaml
+    dggrsId:
+      $ref: parameters/dggs-core/dggrsId.yaml
+    zoneId:
+      $ref: parameters/dggs-core/zoneId.yaml
+    zone-level:
+      $ref: parameters/dggs-core/zone-level.yaml
+    zone-depth:
+      $ref: parameters/dggs-core/zone-depth.yaml
+    compact-zones:
+      $ref: parameters/dggs-core/compact-zones.yaml
+    limit:
+      $ref: parameters/dggs-core/limit-zones.yaml
+    parent-zone:
+      $ref: parameters/dggs-core/parent-zone.yaml
+    subset:
+      $ref: parameters/dggs-core/subset.yaml
+    subset-crs:
+      $ref: parameters/dggs-core/subset-crs.yaml
+    bbox-crs:
+      $ref: parameters/dggs-core/bbox-crs.yaml
+    properties:
+      $ref: parameters/dggs-core/properties.yaml
+    exclude-properties:
+      $ref: parameters/dggs-core/exclude-properties.yaml
+    filter:
+      $ref: parameters/dggs-core/filter.yaml
+    filter-lang:
+      $ref: parameters/dggs-core/filter-lang.yaml
+    crs:
+      $ref: parameters/dggs-core/crs.yaml
+    geometry:
+      $ref: parameters/dggs-core/geometry.yaml
+    profile:
+      $ref: parameters/dggs-core/profile.yaml
+    values-scale:
+      $ref: parameters/dggs-core/values-scale.yaml
+    values-offset:
+      $ref: parameters/dggs-core/values-offset.yaml
+    f-zoneData:
+      $ref: parameters/unspecified/f-zoneData.yaml
+    f-zoneQueries:
+      $ref: parameters/unspecified/f-zoneQueries.yaml
+  responses:
+    NotFound:
+      $ref: responses/common-core/rNotFound.yaml
+    NotAcceptable:
+      $ref: responses/common-core/rNotAcceptable.yaml
+    ServerError:
+      $ref: responses/common-core/rServerError.yaml
+    InvalidParameter:
+      $ref: responses/common-core/rInvalidParameter.yaml
+    Exception:
+      $ref: responses/common-core/rException.yaml
+    LandingPage:
+      $ref: responses/common-core/rLandingPage.yaml
+    Conformance:
+      $ref: responses/common-core/rConformance.yaml
+    API:
+      $ref: responses/common-core/rAPI.yaml
+    Enumeration:
+      $ref: responses/dynamic/rEnumeration.yaml
+    CollectionsList:
+      $ref: responses/common-geodata/rCollectionsList.yaml
+    Collection:
+      $ref: responses/common-geodata/rCollection.yaml
+    DGGSList:
+      $ref: responses/dggs-core/rDGGRSList.yaml
+    DGGRS:
+      $ref: responses/dggs-core/rDGGRS.yaml
+    ZoneData:
+      $ref: responses/dggs-core/rZoneData.yaml
+    EmptyData:
+      $ref: responses/dggs-core/rEmptyData.yaml
+    ZonesList:
+      $ref: responses/dggs-core/rZonesList.yaml

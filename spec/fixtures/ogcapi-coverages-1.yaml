@@ -1,0 +1,198 @@
+openapi: 3.0.3
+info:
+  version: '1.0'
+  title: OGC API - Coverages
+  description: 'Example API Definition for OGC API - Coverages - Part 1: Core'
+  contact:
+    name: Open Geospatial Consortium
+    url: https://ogc.org
+    email: info@ogc.org
+  license:
+    name: OGC License
+    url: http://www.opengeospatial.org/legal/
+servers:
+- description: Example OGC API - Coverages server
+  url: https://maps.ecere.com/ogcapi
+paths:
+  /:
+    $ref: paths/common-core/pLandingPage.yaml
+  /conformance:
+    $ref: paths/common-core/pConformance.yaml
+  /api:
+    $ref: paths/common-core/pAPI.yaml
+  /api/all-collections:
+    $ref: paths/dynamic/pAllCollections.yaml
+  /api/coverage-collections:
+    $ref: paths/dynamic/pCoverageCollections.yaml
+  /api/tileMatrixSets:
+    $ref: paths/dynamic/pTileMatrixSets.yaml
+  /collections:
+    $ref: paths/common-geodata/pCollectionsList.yaml
+  /collections/{collectionId}:
+    $ref: paths/common-geodata/pCollection.yaml
+  /collections/{collectionId}/coverage:
+    $ref: paths/coverages-core/pCoverage.yaml
+  /collections/{collectionId}/schema:
+    $ref: paths/coverages-core/pSchema.yaml
+  /collections/{collectionId}/tiles:
+    $ref: paths/tiles-core/collection-tiles/coverage-tiles/pCollectionCoverageTileSetsList.yaml
+  /collections/{collectionId}/tiles/{tileMatrixSetId}:
+    $ref: paths/tiles-core/collection-tiles/coverage-tiles/pCollectionCoverageTileSet.yaml
+  /collections/{collectionId}/tiles/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}:
+    $ref: paths/tiles-core/collection-tiles/coverage-tiles/pCollectionCoverageTile.yaml
+components:
+  schemas:
+    confClasses:
+      $ref: schemas/common-core/confClasses.yaml
+      description: The conformance classes the deployment implements, per the OGC API conformance declaration.
+    link:
+      $ref: schemas/common-core/link.yaml
+      description: A hyperlink with its relation type, per the OGC API link conventions.
+    landingPage:
+      $ref: schemas/common-core/landingPage.yaml
+      description: 'The landing page of the API: links to the conformance declaration, collections and
+        other resources.'
+    exception:
+      $ref: schemas/common-core/exception.yaml
+      description: An exception report describing why a request failed, per the OGC API exception convention.
+    collections:
+      $ref: schemas/common-geodata/collections.yaml
+      description: A list of the collections available on this API, with their titles, descriptions and
+        links.
+    collectionDesc:
+      $ref: schemas/common-geodata/collectionDesc.yaml
+      description: A description of a collection that hosts the results or data of the API.
+    extent:
+      $ref: schemas/common-geodata/extent.yaml
+      description: The spatial and temporal extent of a collection or deployment.
+    extent-uad:
+      $ref: schemas/common-geodata/extent-uad.yaml
+      description: An extent with unknown, unlimited or multi-dimensional axes, per the OGC Unbounded
+        Axis Description extension.
+    crs:
+      $ref: schemas/common-geodata/crs.yaml
+      description: The coordinate reference systems supported for spatial inputs and outputs.
+    dataType:
+      $ref: schemas/common-geodata/dataType.yaml
+      description: A data type declaration for an input or output value.
+    timeStamp:
+      $ref: schemas/common-geodata/timeStamp.yaml
+      description: The timestamp of the response, per RFC 3339.
+    numberReturned:
+      $ref: schemas/common-geodata/numberReturned.yaml
+      description: The number of items returned in this response.
+    numberMatched:
+      $ref: schemas/common-geodata/numberMatched.yaml
+      description: The number of items matching the selection criteria, if the server can determine it.
+    schema:
+      $ref: schemas/tms/propertiesSchema.yaml
+      description: The schema constraining the values of an input or output of the coverage API.
+    coverageSchema:
+      $ref: schemas/cis/coverage-schema.yaml
+      description: 'The schema constraining a coverage: its domain set, range set and metadata per the
+        CIS standard.'
+    tileSet:
+      $ref: schemas/tms/tileSet.yaml
+      description: 'A tileset: a set of tiles of a collection in a specific tile matrix set and media
+        type.'
+    tileSet-item:
+      $ref: schemas/tms/tileSet-item.yaml
+      description: One tileset of a collection, with its tile matrix set reference, media type and template
+        link.
+    tileMatrixLimits:
+      $ref: schemas/tms/tileMatrixLimits.yaml
+      description: 'The limits of a tile matrix: the tile row and column ranges available for a collection.'
+    2DPoint:
+      $ref: schemas/tms/2DPoint.yaml
+      description: A two-dimensional point with x and y coordinates.
+    2DBoundingBox:
+      $ref: schemas/tms/2DBoundingBox.yaml
+      description: 'A two-dimensional bounding box: lower-left and upper-right corners with the coordinate
+        reference system.'
+    enumeration:
+      $ref: schemas/dynamic/enumeration.yaml
+      description: An input whose value must be one of an enumerated set of literals.
+    all-collections:
+      $ref: schemas/dynamic/all-collections.yaml
+      description: A list of all collections available on this API, across all collection types.
+    coverage-collections:
+      $ref: schemas/dynamic/coverage-collections.yaml
+      description: A list of the coverage collections available on this API.
+    tileMatrixSets:
+      $ref: schemas/dynamic/tileMatrixSets.yaml
+      description: A list of the tile matrix sets supported by this API, per the OGC Two-Dimensional Tile
+        Matrix Set standard.
+  parameters:
+    f-metadata:
+      $ref: parameters/unspecified/f-metadata.yaml
+    collectionId-all:
+      $ref: parameters/common-geodata/collectionId-all.yaml
+    collectionId-coverage:
+      $ref: parameters/common-geodata/collectionId-coverage.yaml
+    datetime:
+      $ref: parameters/common-geodata/datetime.yaml
+    bbox:
+      $ref: parameters/common-geodata/bbox.yaml
+    resolution:
+      $ref: parameters/coverages-core/resolution.yaml
+    properties:
+      $ref: parameters/coverages-core/properties.yaml
+    exclude-properties:
+      $ref: parameters/coverages-core/exclude-properties.yaml
+    width:
+      $ref: parameters/coverages-core/width.yaml
+    height:
+      $ref: parameters/coverages-core/height.yaml
+    subset:
+      $ref: parameters/coverages-core/subset.yaml
+    crs:
+      $ref: parameters/coverages-core/crs.yaml
+    subset-crs:
+      $ref: parameters/coverages-core/subset-crs.yaml
+    bbox-crs:
+      $ref: parameters/coverages-core/bbox-crs.yaml
+    f-coverage:
+      $ref: parameters/unspecified/f-coverage.yaml
+    tileMatrix:
+      $ref: parameters/tiles-core/tileMatrix.yaml
+    tileRow:
+      $ref: parameters/tiles-core/tileRow.yaml
+    tileCol:
+      $ref: parameters/tiles-core/tileCol.yaml
+    tileMatrixSetId:
+      $ref: parameters/unspecified/tileMatrixSetId.yaml
+    f-coverageTile:
+      $ref: parameters/unspecified/f-coverageTile.yaml
+  responses:
+    NotFound:
+      $ref: responses/common-core/rNotFound.yaml
+    NotAcceptable:
+      $ref: responses/common-core/rNotAcceptable.yaml
+    ServerError:
+      $ref: responses/common-core/rServerError.yaml
+    InvalidParameter:
+      $ref: responses/common-core/rInvalidParameter.yaml
+    Exception:
+      $ref: responses/common-core/rException.yaml
+    LandingPage:
+      $ref: responses/common-core/rLandingPage.yaml
+    Conformance:
+      $ref: responses/common-core/rConformance.yaml
+    API:
+      $ref: responses/common-core/rAPI.yaml
+    Coverage:
+      $ref: responses/coverages-core/rCoverage.yaml
+    Enumeration:
+      $ref: responses/dynamic/rEnumeration.yaml
+    CollectionsList:
+      $ref: responses/common-geodata/rCollectionsList.yaml
+    Collection:
+      $ref: responses/common-geodata/rCollection.yaml
+    TileSetsList:
+      $ref: responses/tiles-core/rTileSetsList.yaml
+    TileSet:
+      $ref: responses/tiles-core/rTileSet.yaml
+    CoverageTile:
+      $ref: responses/tiles-core/rCoverageTile.yaml
+    EmptyTile:
+      $ref: responses/tiles-core/rEmptyTile.yaml

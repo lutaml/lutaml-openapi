@@ -1,0 +1,256 @@
+openapi: 3.0.0
+info:
+  version: '1.0'
+  title: OGC API - Maps
+  description: 'Example API Definition for OGC API - Maps - Part 1: Core'
+  contact:
+    name: Open Geospatial Consortium
+    email: info@ogc.org
+  license:
+    name: OGC License
+    url: http://www.opengeospatial.org/legal/
+servers:
+- description: Example OGC API - Maps server
+  url: https://maps.gnosis.earth/ogcapi
+paths:
+  /:
+    $ref: paths/common-core/pLandingPage.yaml
+  /conformance:
+    $ref: paths/common-core/pConformance.yaml
+  /api:
+    $ref: paths/common-core/pAPI.yaml
+  /api/all-collections:
+    $ref: paths/dynamic/pAllCollections.yaml
+  /api/tileMatrixSets:
+    $ref: paths/dynamic/pTileMatrixSets.yaml
+  /api/styles:
+    $ref: paths/dynamic/pStyles.yaml
+  /collections:
+    $ref: paths/common-geodata/pCollectionsList.yaml
+  /collections/{collectionId}:
+    $ref: paths/common-geodata/pCollection.yaml
+  /map:
+    $ref: paths/maps-core/pDataSetMap.yaml
+  /styles/{styleId}/map:
+    $ref: paths/maps-core/pStyledDataSetMap.yaml
+  /collections/{collectionId}/map:
+    $ref: paths/maps-core/pCollectionMap.yaml
+  /collections/{collectionId}/styles/{styleId}/map:
+    $ref: paths/maps-core/pStyledCollectionMap.yaml
+  /projectionsAndDatums:
+    $ref: paths/maps-core/pProjections.yaml
+  /tileMatrixSets:
+    $ref: paths/tiles-core/tileMatrixSets/pTileMatrixSetsList.yaml
+  /tileMatrixSets/{tileMatrixSetId}:
+    $ref: paths/tiles-core/tileMatrixSets/pTileMatrixSet.yaml
+  /map/tiles:
+    $ref: paths/tiles-core/dataset-tiles/map-tiles/pDataSetMapTileSetsList.yaml
+  /map/tiles/{tileMatrixSetId}:
+    $ref: paths/tiles-core/dataset-tiles/map-tiles/pDataSetMapTileSet.yaml
+  /map/tiles/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}:
+    $ref: paths/tiles-core/dataset-tiles/map-tiles/pDataSetMapTile.yaml
+  /styles/{styleId}/map/tiles:
+    $ref: paths/tiles-core/dataset-tiles/styled-map-tiles/pStyledDataSetMapTileSetsList.yaml
+  /styles/{styleId}/map/tiles/{tileMatrixSetId}:
+    $ref: paths/tiles-core/dataset-tiles/styled-map-tiles/pStyledDataSetMapTileSet.yaml
+  /styles/{styleId}/map/tiles/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}:
+    $ref: paths/tiles-core/dataset-tiles/styled-map-tiles/pStyledDataSetMapTile.yaml
+  /collections/{collectionId}/map/tiles:
+    $ref: paths/tiles-core/collection-tiles/map-tiles/pCollectionMapTileSetsList.yaml
+  /collections/{collectionId}/map/tiles/{tileMatrixSetId}:
+    $ref: paths/tiles-core/collection-tiles/map-tiles/pCollectionMapTileSet.yaml
+  /collections/{collectionId}/map/tiles/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}:
+    $ref: paths/tiles-core/collection-tiles/map-tiles/pCollectionMapTile.yaml
+  /collections/{collectionId}/styles/{styleId}/map/tiles:
+    $ref: paths/tiles-core/collection-tiles/styled-map-tiles/pStyledCollectionMapTileSetsList.yaml
+  /collections/{collectionId}/styles/{styleId}/map/tiles/{tileMatrixSetId}:
+    $ref: paths/tiles-core/collection-tiles/styled-map-tiles/pStyledCollectionMapTileSet.yaml
+  /collections/{collectionId}/styles/{styleId}/map/tiles/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}:
+    $ref: paths/tiles-core/collection-tiles/styled-map-tiles/pStyledCollectionMapTile.yaml
+components:
+  schemas:
+    confClasses:
+      $ref: schemas/common-core/confClasses.yaml
+      description: The conformance classes the deployment implements, per the OGC API conformance declaration.
+    link:
+      $ref: schemas/common-core/link.yaml
+      description: A hyperlink with its relation type, per the OGC API link conventions.
+    landingPage:
+      $ref: schemas/common-core/landingPage.yaml
+      description: 'The landing page of the API: links to the conformance declaration, collections and
+        other resources.'
+    exception:
+      $ref: schemas/common-core/exception.yaml
+      description: An exception report describing why a request failed, per the OGC API exception convention.
+    collections:
+      $ref: schemas/common-geodata/collections.yaml
+      description: A list of the collections available on this API, with their titles, descriptions and
+        links.
+    collectionDesc:
+      $ref: schemas/common-geodata/collectionDesc.yaml
+      description: A description of a collection that hosts the results or data of the API.
+    extent:
+      $ref: schemas/common-geodata/extent.yaml
+      description: The spatial and temporal extent of a collection or deployment.
+    extent-uad:
+      $ref: schemas/common-geodata/extent-uad.yaml
+      description: An extent with unknown, unlimited or multi-dimensional axes, per the OGC Unbounded
+        Axis Description extension.
+    crs:
+      $ref: schemas/common-geodata/crs.yaml
+      description: The coordinate reference systems supported for spatial inputs and outputs.
+    dataType:
+      $ref: schemas/common-geodata/dataType.yaml
+      description: A data type declaration for an input or output value.
+    timeStamp:
+      $ref: schemas/common-geodata/timeStamp.yaml
+      description: The timestamp of the response, per RFC 3339.
+    numberReturned:
+      $ref: schemas/common-geodata/numberReturned.yaml
+      description: The number of items returned in this response.
+    numberMatched:
+      $ref: schemas/common-geodata/numberMatched.yaml
+      description: The number of items matching the selection criteria, if the server can determine it.
+    tileSet:
+      $ref: schemas/tms/tileSet.yaml
+      description: 'A tileset: a set of tiles of a collection in a specific tile matrix set and media
+        type.'
+    tileSet-item:
+      $ref: schemas/tms/tileSet-item.yaml
+      description: One tileset of a collection, with its tile matrix set reference, media type and template
+        link.
+    tileMatrixSet:
+      $ref: schemas/tms/tileMatrixSet.yaml
+      description: 'A tile matrix set: the definition of the tiling scheme (crs, tile matrices, their
+        scales and matrix dimensions).'
+    tileMatrixSet-item:
+      $ref: schemas/tms/tileMatrixSet-item.yaml
+      description: 'A subset of a tile matrix set definition: its identifier, URI, crs and supported tile
+        matrices.'
+    tileMatrixLimits:
+      $ref: schemas/tms/tileMatrixLimits.yaml
+      description: 'The limits of a tile matrix: the tile row and column ranges available for a collection.'
+    2DPoint:
+      $ref: schemas/tms/2DPoint.yaml
+      description: A two-dimensional point with x and y coordinates.
+    2DBoundingBox:
+      $ref: schemas/tms/2DBoundingBox.yaml
+      description: 'A two-dimensional bounding box: lower-left and upper-right corners with the coordinate
+        reference system.'
+    enumeration:
+      $ref: schemas/dynamic/enumeration.yaml
+      description: An input whose value must be one of an enumerated set of literals.
+    all-collections:
+      $ref: schemas/dynamic/all-collections.yaml
+      description: A list of all collections available on this API, across all collection types.
+    styles:
+      $ref: schemas/dynamic/styles.yaml
+      description: A list of the styles available for rendering the maps of this API.
+    tileMatrixSets:
+      $ref: schemas/dynamic/tileMatrixSets.yaml
+      description: A list of the tile matrix sets supported by this API, per the OGC Two-Dimensional Tile
+        Matrix Set standard.
+  parameters:
+    f-metadata:
+      $ref: parameters/unspecified/f-metadata.yaml
+    collectionId-all:
+      $ref: parameters/common-geodata/collectionId-all.yaml
+    bbox:
+      $ref: parameters/common-geodata/bbox.yaml
+    datetime:
+      $ref: parameters/common-geodata/datetime.yaml
+    crs:
+      $ref: parameters/maps-core/crs.yaml
+    bbox-crs:
+      $ref: parameters/maps-core/bbox-crs.yaml
+    subset-crs:
+      $ref: parameters/maps-core/subset-crs.yaml
+    collections:
+      $ref: parameters/maps-core/collections.yaml
+    subset:
+      $ref: parameters/maps-core/subset.yaml
+    bgcolor:
+      $ref: parameters/maps-core/bgcolor.yaml
+    transparent:
+      $ref: parameters/maps-core/transparent.yaml
+    void-color:
+      $ref: parameters/maps-core/void-color.yaml
+    void-transparent:
+      $ref: parameters/maps-core/void-transparent.yaml
+    width:
+      $ref: parameters/maps-core/width.yaml
+    height:
+      $ref: parameters/maps-core/height.yaml
+    center:
+      $ref: parameters/maps-core/center.yaml
+    center-crs:
+      $ref: parameters/maps-core/center-crs.yaml
+    scale-denominator:
+      $ref: parameters/maps-core/scale-denominator.yaml
+    mm-per-pixel:
+      $ref: parameters/maps-core/mm-per-pixel.yaml
+    orientation:
+      $ref: parameters/maps-core/orientation.yaml
+    crs-proj-method:
+      $ref: parameters/maps-core/crs-proj-method.yaml
+    crs-proj-center:
+      $ref: parameters/maps-core/crs-proj-center.yaml
+    crs-proj-params:
+      $ref: parameters/maps-core/crs-proj-params.yaml
+    crs-datum:
+      $ref: parameters/maps-core/crs-datum.yaml
+    f-map:
+      $ref: parameters/unspecified/f-map.yaml
+    styleId:
+      $ref: parameters/styles-core/styleId.yaml
+    styleId-collection:
+      $ref: parameters/styles-core/styleId-collection.yaml
+    tileMatrix:
+      $ref: parameters/tiles-core/tileMatrix.yaml
+    tileRow:
+      $ref: parameters/tiles-core/tileRow.yaml
+    tileCol:
+      $ref: parameters/tiles-core/tileCol.yaml
+    tileMatrixSetId:
+      $ref: parameters/unspecified/tileMatrixSetId.yaml
+    f-mapTile:
+      $ref: parameters/unspecified/f-mapTile.yaml
+  responses:
+    NotFound:
+      $ref: responses/common-core/rNotFound.yaml
+    NotAcceptable:
+      $ref: responses/common-core/rNotAcceptable.yaml
+    ServerError:
+      $ref: responses/common-core/rServerError.yaml
+    InvalidParameter:
+      $ref: responses/common-core/rInvalidParameter.yaml
+    Exception:
+      $ref: responses/common-core/rException.yaml
+    LandingPage:
+      $ref: responses/common-core/rLandingPage.yaml
+    Conformance:
+      $ref: responses/common-core/rConformance.yaml
+    API:
+      $ref: responses/common-core/rAPI.yaml
+    Enumeration:
+      $ref: responses/dynamic/rEnumeration.yaml
+    CollectionsList:
+      $ref: responses/common-geodata/rCollectionsList.yaml
+    Collection:
+      $ref: responses/common-geodata/rCollection.yaml
+    Map:
+      $ref: responses/maps-core/rMap.yaml
+    EmptyMap:
+      $ref: responses/maps-core/rEmptyMap.yaml
+    TileSetsList:
+      $ref: responses/tiles-core/rTileSetsList.yaml
+    TileSet:
+      $ref: responses/tiles-core/rTileSet.yaml
+    MapTile:
+      $ref: responses/tiles-core/rMapTile.yaml
+    EmptyTile:
+      $ref: responses/tiles-core/rEmptyTile.yaml
+    TileMatrixSetsList:
+      $ref: responses/tiles-core/rTileMatrixSetsList.yaml
+    TileMatrixSet:
+      $ref: responses/tiles-core/rTileMatrixSet.yaml
