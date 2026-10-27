@@ -1,0 +1,137 @@
+openapi: 3.0.0
+info:
+  version: '1.0'
+  title: OGC API - Styles
+  description: 'Example API Definition for OGC API - Styles - Part 1: Core'
+  contact:
+    name: Open Geospatial Consortium
+    url: https://ogc.org
+    email: info@ogc.org
+  license:
+    name: OGC License
+    url: http://www.opengeospatial.org/legal/
+servers:
+- description: Example OGC API - Styles server
+  url: https://maps.gnosis.earth/ogcapi
+paths:
+  /:
+    $ref: paths/common-core/pLandingPage.yaml
+  /conformance:
+    $ref: paths/common-core/pConformance.yaml
+  /api:
+    $ref: paths/common-core/pAPI.yaml
+  /api/all-collections:
+    $ref: paths/dynamic/pAllCollections.yaml
+  /api/styles:
+    $ref: paths/dynamic/pStyles.yaml
+  /collections:
+    $ref: paths/common-geodata/pCollectionsList.yaml
+  /collections/{collectionId}:
+    $ref: paths/common-geodata/pCollection.yaml
+  /styles:
+    $ref: paths/styles-core/pStyles.yaml
+  /styles/{styleId}:
+    $ref: paths/styles-core/pStyle.yaml
+  /collections/{collectionId}/styles:
+    $ref: paths/styles-core/pCollectionStyles.yaml
+  /collections/{collectionId}/styles/{styleId}:
+    $ref: paths/styles-core/pCollectionStyle.yaml
+components:
+  schemas:
+    confClasses:
+      $ref: schemas/common-core/confClasses.yaml
+      description: The conformance classes the deployment implements, per the OGC API conformance declaration.
+    link:
+      $ref: schemas/common-core/link.yaml
+      description: A hyperlink with its relation type, per the OGC API link conventions.
+    landingPage:
+      $ref: schemas/common-core/landingPage.yaml
+      description: 'The landing page of the API: links to the conformance declaration, collections and
+        other resources.'
+    exception:
+      $ref: schemas/common-core/exception.yaml
+      description: An exception report describing why a request failed, per the OGC API exception convention.
+    collections:
+      $ref: schemas/common-geodata/collections.yaml
+      description: A list of the collections available on this API, with their titles, descriptions and
+        links.
+    extent:
+      $ref: schemas/common-geodata/extent.yaml
+      description: The spatial and temporal extent of a collection or deployment.
+    dataType:
+      $ref: schemas/common-geodata/dataType.yaml
+      description: A data type declaration for an input or output value.
+    timeStamp:
+      $ref: schemas/common-geodata/timeStamp.yaml
+      description: The timestamp of the response, per RFC 3339.
+    numberReturned:
+      $ref: schemas/common-geodata/numberReturned.yaml
+      description: The number of items returned in this response.
+    numberMatched:
+      $ref: schemas/common-geodata/numberMatched.yaml
+      description: The number of items matching the selection criteria, if the server can determine it.
+    enumeration:
+      $ref: schemas/dynamic/enumeration.yaml
+      description: An input whose value must be one of an enumerated set of literals.
+    all-collections:
+      $ref: schemas/dynamic/all-collections.yaml
+      description: A list of all collections available on this API, across all collection types.
+    styles:
+      $ref: schemas/dynamic/styles.yaml
+      description: A list of the styles available on this API, with their titles and links.
+    contact:
+      $ref: schemas/records-core/contact.yaml
+      description: Information about the contact responsible for the API or a resource.
+    contact-roles:
+      $ref: schemas/records-core/roles.yaml
+      description: The roles performed by a contact in relation to the resource, from a codelist.
+    format:
+      $ref: schemas/records-core/format.yaml
+      description: 'The format of an input or output value: media type, encoding and schema.'
+    language:
+      $ref: schemas/records-core/language.yaml
+      description: The natural language of the resource, as an RFC 5646 language code.
+    theme:
+      $ref: schemas/records-core/theme.yaml
+      description: 'A theme with which the resource is classified: a concept scheme and one or more of
+        its concepts.'
+  parameters:
+    f-metadata:
+      $ref: parameters/unspecified/f-metadata.yaml
+    collectionId-all:
+      $ref: parameters/common-geodata/collectionId-all.yaml
+    styleId:
+      $ref: parameters/styles-core/styleId.yaml
+    styleId-collection:
+      $ref: parameters/styles-core/styleId-collection.yaml
+    f-style:
+      $ref: parameters/unspecified/f-style.yaml
+  responses:
+    NotFound:
+      $ref: responses/common-core/rNotFound.yaml
+    NotAcceptable:
+      $ref: responses/common-core/rNotAcceptable.yaml
+    ServerError:
+      $ref: responses/common-core/rServerError.yaml
+    InvalidParameter:
+      $ref: responses/common-core/rInvalidParameter.yaml
+    Exception:
+      $ref: responses/common-core/rException.yaml
+    LandingPage:
+      $ref: responses/common-core/rLandingPage.yaml
+    Conformance:
+      $ref: responses/common-core/rConformance.yaml
+    API:
+      $ref: responses/common-core/rAPI.yaml
+    Enumeration:
+      $ref: responses/dynamic/rEnumeration.yaml
+    CollectionsList:
+      $ref: responses/common-geodata/rCollectionsList.yaml
+    Collection:
+      $ref: responses/common-geodata/rCollection.yaml
+    StylesList:
+      $ref: responses/styles-core/rStyles.yaml
+    Style:
+      $ref: responses/styles-core/rStyle.yaml
+    EmptyStyle:
+      $ref: responses/styles-core/rEmptyStyle.yaml
