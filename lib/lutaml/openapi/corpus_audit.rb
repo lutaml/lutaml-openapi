@@ -71,10 +71,13 @@ module Lutaml
 
       def self.lossless?(path, doc)
         raw = Lutaml::Openapi.parse_raw(File.read(path))
-        # to_hash is the serialization contract: 3.0 sources
-        # denormalize back on it. Hash == is deep and
-        # order-insensitive for keys.
-        doc.to_hash == raw
+        # The model is JSON-keyed: YAML integer keys (unquoted response
+        # codes) stringify through the pipeline, so compare against the
+        # JSON-normalized raw. to_hash is the serialization contract:
+        # 3.0 sources denormalize back on it. Hash == is deep and
+        # key-order-insensitive.
+        normalized = JSON.parse(JSON.generate(raw))
+        doc.to_hash == normalized
       end
     end
   end

@@ -20,3 +20,20 @@ namespace :corpus do
     end
   end
 end
+
+namespace :frontend do
+  File.expand_path("frontend/dist", __dir__)
+  node_modules = File.expand_path("frontend/node_modules", __dir__)
+
+  task :install do
+    unless File.directory?(node_modules)
+      Dir.chdir("frontend") do
+        sh "npm install"
+      end
+    end
+  end
+
+  task build: :install do
+    Dir.chdir("frontend") { sh "npm run build" }
+  end
+end
