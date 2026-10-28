@@ -33,7 +33,7 @@ jobs:
           gem install gem-release
 
       - name: Build SPA dist (packaged only at release time)
-        run: cd frontend && npm install --package-lock-only && npm ci && npm run build
+        run: cd frontend && npm install --package-lock-only && npm ci && npm run build && git checkout -- package-lock.json
 
       - name: Bump version
         if: inputs.next_version != 'skip'
