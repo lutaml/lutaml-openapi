@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
         f.start_with?(*%w[bin/ Gemfile .gitignore .rspec spec/ .github/
                           .rubocop.yml])
     end
-  end
+  end.concat(Dir.glob("frontend/dist/*"))
   spec.require_paths = ["lib"]
 
   spec.add_dependency "json"
