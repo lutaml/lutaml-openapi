@@ -20,7 +20,7 @@ on:
 
 jobs:
   release:
-    uses: metanorma/ci/.github/workflows/rubygems-release.yml@main
+    uses: metanorma/ci/.github/workflows/release.yml@main
     with:
       next_version: ${{ github.event.inputs.next_version }}
       post_install: 'cd frontend && npm install --package-lock-only && npm ci && npm run build && git checkout -- package-lock.json'
