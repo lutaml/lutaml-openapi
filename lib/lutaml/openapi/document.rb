@@ -2,14 +2,14 @@
 
 module Lutaml
   module Openapi
-    # An OpenAPI document: the root object (3.1 shape).
+    # An OpenAPI document: the root object, stored verbatim.
     #
-    # Losslessness lives on the raw hash: `components` (and every other
-    # section) is kept verbatim, and 3.0 sources denormalize back on
-    # serialization. The typed schema view (#schemas) materializes
-    # lutaml-jsonschema models on demand — that view applies the
-    # jsonschema model's own normalizations, so round-trip fidelity is
-    # asserted on the hash, not the typed layer.
+    # Losslessness is structural: every parsed section is kept exactly
+    # as the source carried it (3.0 dialects included), so both wire
+    # serializations round-trip without an emit-time transform. The
+    # typed schema view (#schemas) is where dialects converge — it
+    # materializes lutaml-jsonschema models from the 3.1-normalized
+    # shape, applying the 3.0 frontend for 3.0 sources on demand.
     class Document < Lutaml::Model::Serializable
       attribute :openapi, :string
       attribute :source_dialect, :string
@@ -40,19 +40,20 @@ module Lutaml
       end
 
       # components.schemas as { name => Lutaml::Jsonschema::Schema } —
-      # the typed view for diff/exports/validation.
+      # the typed view for diff/exports/validation. Schema nodes are
+      # normalized into the 3.1 shape here: this is the only place the
+      # 3.0 frontend applies.
       def schemas
         ((components && components["schemas"]) || {}).to_h do |name, value|
-          [name, Lutaml::Jsonschema::Schema.from_json(JSON.generate(value))]
+          shape = source_dialect == "3.0" ? Oas30.normalize(value) : value
+          [name, Lutaml::Jsonschema::Schema.from_json(JSON.generate(shape))]
         end
       end
 
       def to_hash(options = {})
         hash = super
         hash.delete("source_dialect") # internal: tracks the frontend used
-        return hash unless source_dialect == "3.0"
-
-        Oas30.denormalize(hash)
+        hash
       end
     end
   end

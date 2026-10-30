@@ -62,17 +62,25 @@ RSpec.describe Lutaml::Openapi::Document do
                                                                           2] })
   end
 
-  describe "the OGC API - Features corpus (done-when, PLAN.md M1)" do
-    corpus = %w[ogcapi-features-1-oas31.yaml ogcapi-features-1-oas30.yaml
-                ogcapi-records-1-building-blocks.yaml
-                ogcapi-tiles-1-bundled.json]
-    corpus.each do |tag|
-      it "round-trips ogcapi-features-1-#{tag} losslessly" do
-        source = fixture(tag)
-        original = Lutaml::Openapi.parse_raw(source)
+  describe "the OGC API corpus" do
+    corpus = Dir.children(File.expand_path("fixtures", __dir__)).sort
 
-        doc = Lutaml::Openapi.parse(source)
-        emitted = doc.to_hash
+    it "vendors the full audited corpus" do
+      # the 17 OAS documents the metanorma/ogcapi-* fork audit verifies,
+      # plus both tiles variants and the 3.0/3.1 EDR bundles
+      expect(corpus.size).to eq(19)
+    end
+
+    corpus.each do |tag|
+      it "round-trips #{tag} losslessly" do
+        source = fixture(tag)
+        original = JSON.parse(
+          JSON.generate(Lutaml::Openapi.parse_raw(source)),
+        )
+
+        # the wire is the losslessness contract: mapped sections re-emit
+        # in dialect shape, the extensions catch-all verbatim
+        emitted = JSON.parse(Lutaml::Openapi.parse(source).to_json)
 
         diverged = "round trip diverged for #{tag}"
         expect(deep_match?(emitted, original)).to be(true), diverged
@@ -124,7 +132,7 @@ RSpec.describe Lutaml::Openapi::Document do
       expect(count.schema.minimum).to be_nil
     end
 
-    it "denormalizes back to 3.0 semantics on the hash form" do
+    it "keeps 3.0 semantics verbatim on the hash form" do
       doc = Lutaml::Openapi.parse(<<~YAML)
         openapi: 3.0.3
         components:

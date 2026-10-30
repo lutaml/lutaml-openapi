@@ -1,0 +1,661 @@
+openapi: 3.0.0
+info:
+  version: 2.0rc1
+  title: OGC API - Processes
+  description: Example API Definition for OGC API - Processes
+  contact:
+    name: Open Geospatial Consortium
+    email: info@ogc.org
+  license:
+    name: OGC License
+    url: http://www.opengeospatial.org/legal/
+servers:
+- description: 'Example Server 1 (GNOSIS, supporting Part 1: Core /Sync and Part 3: Workflows)'
+  url: https://maps.gnosis.earth/ogcapi
+- description: Example Server 2 (CRIM Hirondelle, supporting Parts 1, 2, 3, 4)
+  url: https://hirondelle.crim.ca/ogcapi/processes
+paths:
+  /:
+    $ref: paths/common-core/pLandingPage.yaml
+  /conformance:
+    $ref: paths/common-core/pConformance.yaml
+  /api:
+    $ref: paths/common-core/pAPI.yaml
+  /api/processes-list:
+    $ref: paths/dynamic/pAllProcesses.yaml
+  /processes:
+    $ref: paths/processes-provenance/pProcessListDeployMetadata.yaml
+  /processes/{processID}:
+    $ref: paths/processes-dru/pProcessDescriptionReplaceUndeploy.yaml
+  /processes/{processID}/package:
+    $ref: paths/processes-dru/pPackage.yaml
+  /processes/{processID}/execution:
+    $ref: paths/processes-workflows/pExecution-workflows.yaml
+  /jobs:
+    get:
+      $ref: paths/processes-core/operations/oProcessList.yaml
+    post:
+      $ref: paths/processes-job-management/operations/oJobCreate.yaml
+  /jobs/{jobID}:
+    $ref: paths/processes-core/pJob.yaml
+  /jobs/{jobID}/results:
+    get:
+      $ref: paths/processes-core/operations/oJobResults.yaml
+    post:
+      $ref: paths/processes-job-management/operations/oJobResultsStart.yaml
+  /jobs/{jobID}/results/{outputID}:
+    $ref: paths/processes-core/pResultOutput.yaml
+  /jobs/{jobID}/results/{outputID}/{N}:
+    $ref: paths/processes-core/pResultOutputValue.yaml
+  /jobs/{jobID}/definition:
+    $ref: paths/processes-job-management/pJobDefinition.yaml
+  /jobs/{jobID}/prov:
+    $ref: paths/processes-job-management/pJobProvenance.yaml
+components:
+  schemas:
+    confClasses:
+      $ref: schemas/common-core/confClasses.yaml
+      description: The conformance classes the deployment implements, per the OGC API conformance declaration.
+    link:
+      $ref: schemas/common-core/link.yaml
+      description: A hyperlink with its relation type, per the OGC API link conventions.
+    landingPage:
+      $ref: schemas/common-core/landingPage.yaml
+      description: 'The landing page of the API: links to the conformance declaration, collections and
+        processes.'
+    exception:
+      $ref: schemas/common-core/exception.yaml
+      description: An exception report describing why a request failed, per the OGC API exception convention.
+    collections:
+      $ref: schemas/common-geodata/collections.yaml
+      description: A list of the collections available on this API.
+    collectionDesc:
+      $ref: schemas/common-geodata/collectionDesc.yaml
+      description: A description of a collection that hosts the results of a job.
+    extent:
+      $ref: schemas/common-geodata/extent.yaml
+      description: The spatial and temporal extent of a collection or deployment.
+    extent-UAD:
+      $ref: schemas/common-geodata/extent-UAD.yaml
+      description: The extent of a collection with unknown, unlimited or multi-dimensional axes.
+    crs:
+      $ref: schemas/crs/crs.yaml
+      description: The coordinate reference systems supported for spatial inputs and outputs.
+    dataType:
+      $ref: schemas/common-geodata/dataType.yaml
+      description: A data type declaration for an input or output value.
+    timeStamp:
+      $ref: schemas/common-geodata/timeStamp.yaml
+      description: The timestamp of the response, per RFC 3339.
+    numberReturned:
+      $ref: schemas/common-geodata/numberReturned.yaml
+      description: The number of items returned in this response.
+    numberMatched:
+      $ref: schemas/common-geodata/numberMatched.yaml
+      description: The number of items matching the selection criteria, if the server can determine it.
+    CWL:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWL
+      description: A Common Workflow Language (CWL) process definition embedded in an OGC App-Pkg deployment.
+    cwltool_CUDARequirement:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/cwltool_CUDARequirement
+      description: The cwltool CUDA requirement for GPU-accelerated executions.
+    CWLAtomic:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLAtomic
+      description: A single (non-composite) CWL value of an input or output.
+    CWLAtomicNested:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLAtomicNested
+      description: A CWL scalar value nested inside a composite type.
+    CWLGraph:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLGraph
+      description: 'A CWL workflow graph: the steps and their dependencies.'
+    CWLWorkflow:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLWorkflow
+      description: 'A CWL workflow: a directed graph of steps composing tools into an analysis.'
+    CWLWorkflowClass:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLWorkflowClass
+      description: The class marker (Workflow) of a CWL workflow definition.
+    CWLWorkflowBase:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLWorkflowBase
+      description: The base definition shared by CWL workflow descriptions.
+    CWLWorkflowSteps:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLWorkflowSteps
+      description: The steps of a CWL workflow.
+    CWLInputsDefinition:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLInputsDefinition
+      description: The inputs section of a CWL process definition.
+    CWLOutputsDefinition:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLOutputsDefinition
+      description: The outputs section of a CWL process definition.
+    CWLWorkflowStepMap:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLWorkflowStepMap
+      description: The steps of a CWL workflow given as a map.
+    CWLWorkflowStepList:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLWorkflowStepList
+      description: The steps of a CWL workflow given as a list.
+    CWLInputList:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLInputList
+      description: The input parameters of a CWL process given as a list.
+    CWLInputMap:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLInputMap
+      description: The input parameters of a CWL process given as a map.
+    ResourceQuantityOrFractional:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/ResourceQuantityOrFractional
+      description: A CWL resource allocation given as a quantity or a fraction of the available resources.
+    CWLExpression:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLExpression
+      description: A CWL expression evaluated at runtime to derive parameter values.
+    InitialWorkDirListing:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/InitialWorkDirListing
+      description: The listing of files staged into the working directory before a CWL execution.
+    CWLRequirementsMap:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLRequirementsMap
+      description: The requirements of a CWL process given as a map.
+    CWLRequirements:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLRequirements
+      description: 'The requirements of a CWL process: mandatory features the execution platform must
+        support.'
+    CWLCommand:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLCommand
+      description: The command-line template of a CWL tool or expression tool.
+    InputBinding:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/InputBinding
+      description: The command-line binding of a CWL input parameter.
+    CWLInputItem:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLInputItem
+      description: One input parameter of a CWL process.
+    DirectoryListingDirent:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/DirectoryListingDirent
+      description: One entry of a directory listing in a CWL initial work directory.
+    DirectoryListingFileOrDirectory:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/DirectoryListingFileOrDirectory
+      description: A file or directory entry in a CWL directory listing.
+    SoftwareRequirement:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/SoftwareRequirement
+      description: A CWL requirement listing the software packages the execution needs.
+    DockerRequirement:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/DockerRequirement
+      description: A CWL requirement specifying the Docker image in which the process executes.
+    ShellCommandRequirement:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/ShellCommandRequirement
+      description: A CWL requirement enabling shell command expressions in the command line.
+    EnvVarRequirement:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/EnvVarRequirement
+      description: A CWL requirement defining environment variables for the execution.
+    SchemaDefRequirement:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/SchemaDefRequirement
+      description: A CWL requirement defining custom schemas used by the inputs and outputs.
+    InitialWorkDirRequirement:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/InitialWorkDirRequirement
+      description: A CWL requirement staging files into the initial working directory.
+    InlineJavascriptRequirement:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/InlineJavascriptRequirement
+      description: A CWL requirement enabling inline Javascript expressions.
+    InplaceUpdateRequirement:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/InplaceUpdateRequirement
+      description: A CWL requirement declaring in-place update semantics for nested outputs.
+    LoadListingRequirement:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/LoadListingRequirement
+      description: A CWL requirement controlling how directory inputs are loaded into listings.
+    NetworkAccessRequirement:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/NetworkAccessRequirement
+      description: A CWL requirement declaring the network access needs of the tool.
+    ResourceRequirement:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/ResourceRequirement
+      description: A CWL requirement declaring the compute resources (cores, memory, tmpdir) of the execution.
+    ScatterFeatureRequirement:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/ScatterFeatureRequirement
+      description: A CWL requirement enabling scattering an input over multiple executions.
+    WorkReuseRequirement:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/WorkReuseRequirement
+      description: A CWL requirement controlling reuse of prior execution outputs.
+    ToolTimeLimitRequirement:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/ToolTimeLimitRequirement
+      description: A CWL requirement limiting the tool execution time.
+    MultipleInputFeatureRequirement:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/MultipleInputFeatureRequirement
+      description: A CWL requirement enabling an input to accept multiple values.
+    StepInputExpressionRequirement:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/StepInputExpressionRequirement
+      description: A CWL requirement enabling expressions in workflow step inputs.
+    SubworkflowFeatureRequirement:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/SubworkflowFeatureRequirement
+      description: A CWL requirement enabling nested sub-workflows.
+    CWLHints:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLHints
+      description: 'The hints of a CWL process: optional, non-binding resource requirements.'
+    CWLWorkflowStepDefinition:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLWorkflowStepDefinition
+      description: The definition of one step of a CWL workflow.
+    CWLWorkflowStepScatter:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLWorkflowStepScatter
+      description: The scatter specification of a CWL workflow step.
+    CWLWorkflowStepId:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLWorkflowStepId
+      description: The identifier of a CWL workflow step.
+    CWLHintsMap:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLHintsMap
+      description: The hints of a CWL process given as a map.
+    CWLHintsList:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLHintsList
+      description: The hints of a CWL process given as a list.
+    CWLWorkflowStepIn:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLWorkflowStepIn
+      description: The input bindings of a CWL workflow step.
+    CWLWorkflowStepRun:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLWorkflowStepRun
+      description: The tool or sub-workflow a CWL workflow step runs.
+    CWLWorkflowStepWhen:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLWorkflowStepWhen
+      description: The conditional (when) expression of a CWL workflow step.
+    CWLWorkflowStepOut:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLWorkflowStepOut
+      description: The outputs a CWL workflow step exposes to later steps.
+    CWLWorkflowStepInMap:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLWorkflowStepInMap
+      description: The input bindings of a CWL workflow step given as a map.
+    CWLWorkflowStepInList:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLWorkflowStepInList
+      description: The input bindings of a CWL workflow step given as a list.
+    CWLWorkflowStepInItem:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLWorkflowStepInItem
+      description: One input binding of a CWL workflow step.
+    CWLWorkflowStepInputId:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLWorkflowStepInputId
+      description: The identifier of a CWL workflow step input.
+    CWLWorkflowStepInputBase:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLWorkflowStepInputBase
+      description: The base type of a CWL workflow step input.
+    CWLWorkflowStepInputDefault:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLWorkflowStepInputDefault
+      description: The default value of a CWL workflow step input.
+    NetworkAccess:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/NetworkAccess
+      description: A CWL requirement declaring whether the execution requires network access.
+    EnvironmentDef:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/EnvironmentDef
+      description: The definition of an environment variable for a CWL execution.
+    CWLType:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLType
+      description: The type of a CWL input or output parameter.
+    CWLOutputObject:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLOutputObject
+      description: An output of a CWL process given as an object.
+    CWLOutputStdOut:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLOutputStdOut
+      description: Marks a CWL output captured from standard output.
+    CWLOutputStdErr:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLOutputStdErr
+      description: Marks a CWL output captured from standard error.
+    CWLTypeEnum:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLTypeEnum
+      description: An enumerated type of a CWL parameter.
+    CWLTypeRecordSchema:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLTypeRecordSchema
+      description: The record schema of a CWL parameter.
+    CWLTypeRecordArray:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLTypeRecordArray
+      description: An array of CWL record types.
+    CWLDefaultTypedConditional:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLDefaultTypedConditional
+      description: A default value with a conditional type in a CWL input.
+    CWLTypeBase:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLTypeBase
+      description: A base scalar or file type of a CWL parameter.
+    CWLTypeList:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLTypeList
+      description: A list type of a CWL parameter.
+    AnyType:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/AnyType
+      description: A value of any type, unconstrained.
+    CWLTypeDefinition:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLTypeDefinition
+      description: The type definition of a CWL parameter.
+    CWLTypeArray:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLTypeArray
+      description: An array type of a CWL parameter.
+    CWLTypeRecordRef:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLTypeRecordRef
+      description: A reference to a CWL record type.
+    CWLTypeRecordFieldsMap:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLTypeRecordFieldsMap
+      description: The fields of a CWL record type given as a map.
+    CWLTypeRecordFieldsList:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLTypeRecordFieldsList
+      description: The fields of a CWL record type given as a list.
+    CWLTypeRecordFieldDefBase:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLTypeRecordFieldDefBase
+      description: The base type of a CWL record field.
+    CWLFileOnlyParametersConditional:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLFileOnlyParametersConditional
+      description: A CWL input or output restricted to File values under a conditional type.
+    CWLDirectoryOnlyParametersConditional:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLDirectoryOnlyParametersConditional
+      description: A CWL input restricted to directory values under a conditional type.
+    CWLFileOnlyParameters:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLFileOnlyParameters
+      description: A CWL input or output restricted to File values.
+    CWLTypeRecordSecondaryFiles:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLTypeRecordSecondaryFiles
+      description: The secondary files associated with a CWL record type.
+    CWLTypeRecordSecondaryFileSchema:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLTypeRecordSecondaryFileSchema
+      description: The secondary-file schema of a CWL record type.
+    CWLRequirementsList:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLRequirementsList
+      description: The requirements of a CWL process given as a list.
+    CWLRequirementsItem:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLRequirementsItem
+      description: One requirement of a CWL process.
+    CWLOutputStdOutDefinition:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLOutputStdOutDefinition
+      description: The definition of a CWL output captured from standard output.
+    CWLOutputStdOutObjectType:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLOutputStdOutObjectType
+      description: The object type of a CWL standard-output output.
+    CWLOutputStdErrDefinition:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLOutputStdErrDefinition
+      description: The definition of a CWL output captured from standard error.
+    CWLOutputStdErrObjectType:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLOutputStdErrObjectType
+      description: The object type of a CWL standard-error output.
+    CWLTypeRecordFieldDef:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLTypeRecordFieldDef
+      description: The definition of one field of a CWL record type.
+    CWLDefault:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLDefault
+      description: The default value of a CWL input parameter.
+    AnyLiteralType:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/AnyLiteralType
+      description: A literal value of any permitted type.
+    AnyLiteralList:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/AnyLiteralList
+      description: A list of literal values permitted for an input.
+    CWLDefaultLocation:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLDefaultLocation
+      description: A default value of a CWL input referenced by location.
+    CWLDefaultObject:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLDefaultObject
+      description: A default value of a CWL input given as an object.
+    CWLTypeRecordFields:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLTypeRecordFields
+      description: The fields of a CWL record type.
+    CWLImport:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLImport
+      description: A CWL $import reference to an external definition.
+    CWLVersion:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLVersion
+      description: The CWL specification version of the process definition.
+    CWLMetadata:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLMetadata
+      description: The metadata fields of a CWL process definition.
+    CWLDocumentation:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLDocumentation
+      description: The documentation field of a CWL process definition.
+    CWLAtomicBase:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLAtomicBase
+      description: The base scalar types of a CWL value.
+    CWLOutputList:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLOutputList
+      description: The output parameters of a CWL process given as a list.
+    CWLOutputMap:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLOutputMap
+      description: The output parameters of a CWL process given as a map.
+    CWLOutputItem:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLOutputItem
+      description: One output parameter of a CWL process.
+    CWLWorkflowStepObject:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLWorkflowStepObject
+      description: A CWL workflow step given as an object.
+    CWLInputStdInDefinition:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLInputStdInDefinition
+      description: The definition of a CWL input taken from standard input.
+    CWLInputStdInObjectType:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLInputStdInObjectType
+      description: The object type of a CWL standard-input input.
+    CWLInputStdIn:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLInputStdIn
+      description: Marks a CWL input taken from standard input.
+    CWLArguments:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/CWLArguments
+      description: The command-line arguments of a CWL tool invocation.
+    SoftwarePackage:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/SoftwarePackage
+      description: A software package required by a CWL execution, with its version specs.
+    SoftwarePackageSpecs:
+      $ref: schemas/cwl/cwl-json-schema.yaml#/$defs/SoftwarePackageSpecs
+      description: The version specifications of a required software package.
+    CQL2:
+      $ref: schemas/cql2/cql2.yaml
+      description: A CQL2 filter expression, constraining the inputs of a process per the OGC CQL2 standard.
+    enumeration:
+      $ref: schemas/dynamic/enumeration.yaml
+      description: An input whose value must be one of an enumerated set of literals.
+    processes-list:
+      $ref: schemas/dynamic/processes-list.yaml
+      description: A list of the processes available on this API.
+    processSummary:
+      $ref: schemas/processes-core/processSummary.yaml
+      description: A summary of a process that can be executed by this API, including its machine-readable
+        and human-readable metadata.
+    process:
+      $ref: schemas/processes-core/process.yaml
+      description: A process that can be executed by this API. The process description includes the machine-readable
+        and human-readable metadata of the process, in particular its inputs and outputs.
+    processList:
+      $ref: schemas/processes-core/processList.yaml
+      description: A list of the processes available on this API together with their summaries.
+    jobList:
+      $ref: schemas/processes-core/jobList.yaml
+      description: A list of jobs created by this API for the current user.
+    bbox-processes:
+      $ref: schemas/processes-core/bbox.yaml
+      description: A bounding box constraint on the area of interest of a process input.
+    descriptionType:
+      $ref: schemas/processes-core/descriptionType.yaml
+      description: 'Base type for process, input and output descriptions: identifier, title, description,
+        metadata and additional classification information.'
+    binaryValue:
+      $ref: schemas/processes-core/binaryValue.yaml
+      description: A binary input or output value, encoded per its declared media type.
+    execute-workflow:
+      $ref: schemas/processes-workflows/execute-workflows.yaml
+      description: An execute request for a process deployed as a workflow, combining the inputs of the
+        nested processes.
+    inputParameterized:
+      $ref: schemas/processes-workflows/inputParameterized.yaml
+      description: An input description with a schema that constrains the permitted values of the input.
+    format:
+      $ref: schemas/processes-core/format.yaml
+      description: 'The format of an input or output value: media type, encoding and schema.'
+    schemaAndOccurrences:
+      $ref: schemas/processes-core/schemaAndOccurrences.yaml
+      description: A schema together with the occurrences of the input in the process.
+    inputDescription:
+      $ref: schemas/processes-core/inputDescription.yaml
+      description: A description of an input of a process, including its schema, metadata and the supported
+        input values.
+    value:
+      $ref: schemas/processes-core/value.yaml
+      description: A permitted value of an input with an optional human-readable label.
+    collectionValue:
+      $ref: schemas/processes-core/collectionValue.yaml
+      description: A result value hosted as a collection.
+    valueNoObject:
+      $ref: schemas/processes-core/valueNoObject.yaml
+      description: A literal or array value of an input, excluding object values.
+    valueNoObject-workflows:
+      $ref: schemas/processes-workflows/valueNoObject-workflows.yaml
+      description: A literal or array value of a workflow input, excluding object values.
+    jobControlOptions:
+      $ref: schemas/processes-core/jobControlOptions.yaml
+      description: 'The job control options supported by this API: asynchronous execution, synchronous
+        execution and/or dismiss of running jobs.'
+    metadata:
+      $ref: schemas/processes-core/metadata.yaml
+      description: 'Additional metadata of a process, input or output: roles with typed values or external
+        references.'
+    values:
+      $ref: schemas/processes-core/values.yaml
+      description: The permitted values of an input, as an enumeration, range or schema.
+    values-workflows:
+      $ref: schemas/processes-workflows/values-workflows.yaml
+      description: The permitted values of a workflow input, as an enumeration, range or schema.
+    outputSelection:
+      $ref: schemas/processes-core/outputSelection.yaml
+      description: Selects the outputs of a process to be included in the results of an execution; by
+        default all outputs are returned.
+    outputDescription:
+      $ref: schemas/processes-core/outputDescription.yaml
+      description: A description of an output of a process, including its schema and metadata.
+    qualifiedValue:
+      $ref: schemas/processes-core/qualifiedValue.yaml
+      description: A value together with the format it is encoded in, used where multiple formats are
+        supported.
+    reference:
+      $ref: schemas/processes-core/reference.yaml
+      description: 'A reference to external metadata: the role of the reference and its URL.'
+    results:
+      $ref: schemas/processes-core/results.yaml
+      description: The outputs of a successfully completed job execution. Each output is identified by
+        its identifier in the process description.
+    schema:
+      $ref: schemas/processes-core/schema.yaml
+      description: The schema constraining the values of an input or output.
+    statusCode:
+      $ref: schemas/processes-core/statusCode.yaml
+      description: 'The state of the job execution: accepted, running, successful, failed or dismissed.'
+    subscriber:
+      $ref: schemas/processes-core/subscriber.yaml
+      description: Optional subscriber endpoints the client may supply so that the API can asynchronously
+        notify the client about job progress and completion.
+    inlineOrRefValue:
+      $ref: schemas/processes-core/inlineOrRefValue.yaml
+      description: Either an inline literal, object or array value, or a reference to a remote value that
+        is fetched at execution time.
+    inlineOrRefValue-workflows:
+      $ref: schemas/processes-workflows/inlineOrRefValue-workflows.yaml
+      description: Either an inline literal, object or array value, or a reference to a remote value,
+        for workflow inputs and outputs.
+    fieldsModifiers:
+      $ref: schemas/processes-core/fieldsModifiers.yaml
+      description: Modifiers restricting the fields (properties) of an input or output object.
+    statusInfo:
+      $ref: schemas/processes-core/statusInfo.yaml
+      description: The status of an execution job, including its current state (accepted, running, successful,
+        failed or dismissed) and, once available, the location of the results.
+    dataAccessAPIs:
+      $ref: schemas/processes-core/dataAccessAPIs.yaml
+      description: The data access APIs through which the outputs of a job can be retrieved.
+    apis:
+      $ref: schemas/processes-core/apis.yaml
+      description: The conformance classes and entry points of the APIs advertised by this deployment.
+    dataClasses:
+      $ref: schemas/processes-core/dataClasses.yaml
+      description: The data classes supported by a process deployment.
+    ogcapppkg:
+      $ref: schemas/processes-dru/ogcapppkg.yaml
+      description: 'An OGC API - Processes application package (OGC App-Pkg): the deployment description
+        of a process, referencing or embedding the executable artifacts.'
+    staticIndicator:
+      $ref: schemas/processes-dru/staticIndicator.yaml
+      description: Indicates whether the input value of a workflow is static (identical for every nested
+        execution) or dynamic.
+  parameters:
+    f-metadata:
+      $ref: parameters/unspecified/f-metadata.yaml
+    datetime:
+      $ref: parameters/common-geodata/datetime.yaml
+    crs:
+      $ref: parameters/common-crs/crs.yaml
+    subset-crs:
+      $ref: parameters/common-crs/subset-crs.yaml
+    processID-path:
+      $ref: parameters/processes-core/processID-path.yaml
+    outputID:
+      $ref: parameters/processes-core/outputID.yaml
+    N:
+      $ref: parameters/processes-core/N.yaml
+    prefer-header-return:
+      $ref: parameters/processes-core/prefer-header-return.yaml
+    jobID:
+      $ref: parameters/processes-core/jobID.yaml
+    processID-query:
+      $ref: parameters/processes-core/processID-query.yaml
+    output:
+      $ref: parameters/processes-core/output.yaml
+    limit:
+      $ref: parameters/processes-core/limit.yaml
+    type:
+      $ref: parameters/processes-core/type.yaml
+    status:
+      $ref: parameters/processes-core/status.yaml
+    minDuration:
+      $ref: parameters/processes-core/minDuration.yaml
+    maxDuration:
+      $ref: parameters/processes-core/maxDuration.yaml
+    w:
+      $ref: parameters/processes-dru/w-param.yaml
+  responses:
+    NotFound:
+      $ref: responses/common-core/rNotFound.yaml
+    NotAcceptable:
+      $ref: responses/common-core/rNotAcceptable.yaml
+    ServerError:
+      $ref: responses/common-core/rServerError.yaml
+    InvalidParameter:
+      $ref: responses/common-core/rInvalidParameter.yaml
+    NotAllowed:
+      $ref: responses/common-core/rNotAllowed.yaml
+    Exception:
+      $ref: responses/common-core/rException.yaml
+    LandingPage:
+      $ref: responses/common-core/rLandingPage.yaml
+    Conformance:
+      $ref: responses/common-core/rConformance.yaml
+    API:
+      $ref: responses/common-core/rAPI.yaml
+    Enumeration:
+      $ref: responses/dynamic/rEnumeration.yaml
+    ProcessList:
+      $ref: responses/processes-core/rProcessList.yaml
+    ProcessDescription:
+      $ref: responses/processes-core/rProcessDescription.yaml
+    Results:
+      $ref: responses/processes-core/rResults.yaml
+    Output:
+      $ref: responses/processes-core/rOutput.yaml
+    OutputValue:
+      $ref: responses/processes-core/rOutputValue.yaml
+    Status:
+      $ref: responses/processes-core/rStatus.yaml
+    JobList:
+      $ref: responses/processes-core/rJobList.yaml
+    ExecuteAsync:
+      $ref: responses/processes-core/rExecuteAsync.yaml
+    ExecuteSync:
+      $ref: responses/processes-core/rExecuteSync.yaml
+    ExecuteSyncRawRef:
+      $ref: responses/processes-core/rExecuteSyncRawRef.yaml
+    EmptyResponse:
+      $ref: responses/processes-core/rEmpty.yaml
+    DeployProcess:
+      $ref: responses/processes-dru/rDeployProcess.yaml
+    ProcessSummary:
+      $ref: responses/processes-dru/rProcessSummary.yaml
+    DuplicateProcess:
+      $ref: responses/processes-dru/rDuplicateProcess.yaml
+    ImmutableProcess:
+      $ref: responses/processes-dru/rImmutableProcess.yaml
+    JobDefinition:
+      $ref: responses/processes-job-management/rJobDefinition.yaml
+    JobProvenance:
+      $ref: responses/processes-provenance/rJobProvenance.yaml
+    JobProvMissing:
+      $ref: responses/processes-provenance/rJobProvMissing.yaml
+    JobProvUnsupportedFormat:
+      $ref: responses/processes-provenance/rJobProvUnsupportedFormat.yaml
+definitions:
+  Context:
+    $ref: https://www.w3.org/submissions/prov-jsonld/schema.json#definitions/Context
+  ArrayOfValues:
+    $ref: https://www.w3.org/submissions/prov-jsonld/schema.json#definitions/ArrayOfValues
