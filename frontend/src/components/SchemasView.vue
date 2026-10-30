@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { inject, computed } from 'vue'
+import { t, tf } from '../i18n'
 
 const openapi = inject<Record<string, any>>('openapi') || {}
 const props = defineProps<{ filter: string }>()
@@ -30,15 +31,15 @@ const entries = computed(() => {
 </script>
 
 <template>
-  <section aria-label="Schemas">
-    <h2>Schemas</h2>
+  <section :aria-label="t('schemas.heading')">
+    <h2>{{ t('schemas.heading') }}</h2>
     <div v-for="e in entries" :key="e.name" class="schema">
       <h3>{{ e.name }}</h3>
       <p v-if="e.description">{{ e.description }}</p>
       <table v-if="e.properties.length">
-        <caption>Properties of {{ e.name }}</caption>
+        <caption>{{ tf('schemas.propertiesOf', { name: e.name }) }}</caption>
         <thead>
-          <tr><th>Name</th><th>Type</th><th>Description</th></tr>
+          <tr><th>{{ t('schemas.name') }}</th><th>{{ t('schemas.type') }}</th><th>{{ t('schemas.description') }}</th></tr>
         </thead>
         <tbody>
           <tr v-for="p in e.properties" :key="p.name">
@@ -49,6 +50,6 @@ const entries = computed(() => {
         </tbody>
       </table>
     </div>
-    <p v-if="!entries.length">No schemas match the filter.</p>
+    <p v-if="!entries.length">{{ t('schemas.noMatch') }}</p>
   </section>
 </template>

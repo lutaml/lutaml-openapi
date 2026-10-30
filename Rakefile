@@ -9,4 +9,19 @@ require "rubocop/rake_task"
 
 RuboCop::RakeTask.new
 
-task default: %i[spec rubocop]
+task default: %i[spec rubocop frontend:audit]
+
+namespace :frontend do
+  desc "Build the Vue frontend"
+  task :build do
+    Dir.chdir(File.expand_path("frontend", __dir__)) do
+      sh "npm install"
+      sh "npm run build"
+    end
+  end
+
+  desc "axe-core accessibility audit of the generated SPA (needs Chrome)"
+  task :audit do
+    ruby "script/axe_audit"
+  end
+end

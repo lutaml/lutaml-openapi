@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, ref, provide } from 'vue'
+import { computed, ref, provide, onMounted } from 'vue'
 import OverviewView from './components/OverviewView.vue'
 import PathsView from './components/PathsView.vue'
 import SchemasView from './components/SchemasView.vue'
+import { t, tf, initLocaleFromUrl, localeLabel, nextLocale, setLocale } from './i18n'
 
 const props = defineProps<{ openapi: Record<string, any> }>()
 provide('openapi', props.openapi)
@@ -10,10 +11,16 @@ provide('openapi', props.openapi)
 const filter = ref('')
 const view = ref<'overview' | 'paths' | 'schemas'>('overview')
 const views = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'paths', label: 'Paths' },
-  { id: 'schemas', label: 'Schemas' },
+  { id: 'overview', label: 'nav.overview' },
+  { id: 'paths', label: 'nav.paths' },
+  { id: 'schemas', label: 'nav.schemas' },
 ] as const
+
+onMounted(() => initLocaleFromUrl())
+
+function switchLocale() {
+  setLocale(nextLocale())
+}
 
 const info = computed(() => (props.openapi.info as any) || {})
 const schemaCount = computed(
@@ -25,18 +32,18 @@ const pathCount = computed(() => Object.keys((props.openapi.paths as any) || {})
 <template>
   <div class="docs">
     <header class="docs-header">
-      <h1>{{ info.title || 'OpenAPI document' }}</h1>
+      <h1>{{ info.title || t('app.titleFallback') }}</h1>
       <p v-if="info.version" class="version">
-        {{ info.title ? 'version' : '' }} {{ info.version }}
+        {{ info.title ? t('app.version') : '' }} {{ info.version }}
       </p>
       <input
         v-model="filter"
         class="filter"
         type="search"
-        placeholder="Filter…"
-        aria-label="Filter sections"
+        :placeholder="t('app.filterPlaceholder')"
+        :aria-label="t('app.filterAria')"
       />
-      <nav aria-label="Sections">
+      <nav :aria-label="t('nav.sections')">
         <button
           v-for="v in views"
           :key="v.id"
@@ -44,9 +51,16 @@ const pathCount = computed(() => Object.keys((props.openapi.paths as any) || {})
           :class="{ active: view === v.id }"
           @click="view = v.id"
         >
-          {{ v.label }}
+          {{ t(v.label) }}
         </button>
       </nav>
+      <button
+        class="nav-btn locale-btn"
+        :title="t('app.switchLocale')"
+        @click="switchLocale"
+      >
+        {{ localeLabel(nextLocale()) }}
+      </button>
     </header>
     <main>
       <OverviewView v-if="view === 'overview'" :filter="filter" />
@@ -54,7 +68,7 @@ const pathCount = computed(() => Object.keys((props.openapi.paths as any) || {})
       <SchemasView v-else :filter="filter" />
     </main>
     <footer class="docs-footer">
-      <span>{{ schemaCount }} schemas · {{ pathCount }} paths</span>
+      <span>{{ tf('footer.stats', { schemas: schemaCount, paths: pathCount }) }}</span>
     </footer>
   </div>
 </template>
