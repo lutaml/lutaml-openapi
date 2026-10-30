@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { inject, computed } from 'vue'
+import { t } from '../i18n'
 
 const openapi = inject<Record<string, any>>('openapi') || {}
 const props = defineProps<{ filter: string }>()
@@ -14,10 +15,10 @@ const shown = computed(() => {
 </script>
 
 <template>
-  <section aria-label="Overview">
-    <h2>Overview</h2>
+  <section :aria-label="t('overview.heading')">
+    <h2>{{ t('overview.heading') }}</h2>
     <p v-if="info.description">{{ info.description }}</p>
-    <h3 v-if="shown.length">Servers</h3>
+    <h3 v-if="shown.length">{{ t('overview.servers') }}</h3>
     <ul>
       <li v-for="s in shown" :key="s.url">
         <code>{{ s.url }}</code> — {{ s.protocol || 'https' }}

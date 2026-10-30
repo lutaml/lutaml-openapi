@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { inject, computed } from 'vue'
+import { t } from '../i18n'
 
 const openapi = inject<Record<string, any>>('openapi') || {}
 const props = defineProps<{ filter: string }>()
@@ -31,8 +32,8 @@ const entries = computed(() => {
 </script>
 
 <template>
-  <section aria-label="Paths">
-    <h2>Paths</h2>
+  <section :aria-label="t('paths.heading')">
+    <h2>{{ t('paths.heading') }}</h2>
     <div v-for="e in entries" :key="e.path" class="path">
       <h3><code>{{ e.path }}</code></h3>
       <div v-for="op in e.operations" :key="op.method" class="op">
@@ -41,6 +42,6 @@ const entries = computed(() => {
         <p v-if="op.description">{{ op.description }}</p>
       </div>
     </div>
-    <p v-if="!entries.length">No paths match the filter.</p>
+    <p v-if="!entries.length">{{ t('paths.noMatch') }}</p>
   </section>
 </template>
