@@ -33,7 +33,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "json"
   spec.add_dependency "lutaml-jsonschema", "~> 0.1.25"
   spec.add_dependency "lutaml-model", "~> 0.8.122"
-  # 0.6.50.0's marshal-engine strict-dup scan false-flags valid documents
-  # on native-less lanes (leptris/yeptris-ruby#333, the #680 class)
-  spec.add_dependency "yeptris", "~> 0.6.34", "!= 0.6.50.0"
+  spec.add_dependency "yeptris", "~> 0.6.34"
 end
