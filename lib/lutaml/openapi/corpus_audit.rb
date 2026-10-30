@@ -73,11 +73,12 @@ module Lutaml
         raw = Lutaml::Openapi.parse_raw(File.read(path))
         # The model is JSON-keyed: YAML integer keys (unquoted response
         # codes) stringify through the pipeline, so compare against the
-        # JSON-normalized raw. to_hash is the serialization contract:
-        # 3.0 sources denormalize back on it. Hash == is deep and
+        # JSON-normalized raw. The wire is the losslessness contract:
+        # to_json re-emits mapped sections in dialect shape and the
+        # extensions catch-all verbatim. Hash == is deep and
         # key-order-insensitive.
         normalized = JSON.parse(JSON.generate(raw))
-        doc.to_hash == normalized
+        JSON.parse(doc.to_json) == normalized
       end
     end
   end

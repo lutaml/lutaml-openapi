@@ -2,9 +2,10 @@
 
 module Lutaml
   module Openapi
-    # The OpenAPI 3.0 frontend: normalizes 3.0 documents into the 3.1
-    # shape before modeling, and denormalizes back on serialization —
-    # both directions as pure hash walks.
+    # The OpenAPI 3.0 frontend: normalizes 3.0 schema nodes into the
+    # 3.1 shape as a pure hash walk. Applied only where the typed layer
+    # consumes nodes — the document hash itself is stored verbatim, so
+    # no denormalization exists.
     module Oas30
       module_function
 
@@ -13,14 +14,6 @@ module Lutaml
           node = normalize_nullable(node)
           normalize_exclusive(node, "exclusiveMinimum", "minimum") ||
             normalize_exclusive(node, "exclusiveMaximum", "maximum") || node
-        end
-      end
-
-      def denormalize(hash)
-        walk(hash) do |node|
-          node = denormalize_nullable(node)
-          node = denormalize_exclusive(node, "exclusiveMinimum", "minimum")
-          denormalize_exclusive(node, "exclusiveMaximum", "maximum")
         end
       end
 
@@ -49,20 +42,6 @@ module Lutaml
         node
       end
 
-      def denormalize_nullable(node)
-        types = node["type"]
-        return node unless types.is_a?(Array) && types.include?("null")
-
-        rest = types - ["null"]
-        if rest.empty?
-          node.delete("type") # 3.0 had only `nullable: true`, no type
-        else
-          node["type"] = rest.size == 1 ? rest.first : rest
-        end
-        node["nullable"] = true
-        node
-      end
-
       # 3.0 boolean exclusivity rides beside the bound; 3.1 carries the
       # bound in the exclusive* keyword itself.
       def normalize_exclusive(node, exclusive, bound)
@@ -71,15 +50,6 @@ module Lutaml
         flag = node.delete(exclusive)
         # the bound MOVES into exclusive*: minimum must not survive it
         node[exclusive] = node.delete(bound) if flag == true && node.key?(bound)
-        node
-      end
-
-      def denormalize_exclusive(node, exclusive, bound)
-        value = node[exclusive]
-        return node unless value.is_a?(Numeric)
-
-        node = node.merge(bound => value)
-        node[exclusive] = true
         node
       end
     end

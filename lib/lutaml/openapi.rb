@@ -8,10 +8,11 @@ require "json"
 module Lutaml
   # OpenAPI 3.0/3.1 as a lossless lutaml-model.
   #
-  # The 3.1 shape is the model (its Schema objects are JSON Schema
-  # 2020-12, carried by lutaml-jsonschema); 3.0 documents are
-  # normalized into it by the 3.0 frontend while `source_dialect` is
-  # kept, so serialization re-emits 3.0 semantics for 3.0 sources.
+  # The document is stored verbatim — what was parsed is what the wire
+  # re-emits, so losslessness is structural rather than an emit-time
+  # transform. The 3.1 shape is the typed view: `source_dialect` tracks
+  # the frontend, and 3.0 schema nodes are normalized into JSON Schema
+  # 2020-12 by the 3.0 frontend when the typed layer materializes them.
   # Anything unmodeled rides the extensions catch-all — documents
   # round-trip verbatim.
   module Openapi
@@ -26,7 +27,6 @@ module Lutaml
     def self.parse(string)
       data = parse_raw(string)
       dialect = data["openapi"].to_s.start_with?("3.0") ? "3.0" : "3.1"
-      data = Oas30.normalize(data) if dialect == "3.0"
 
       Document.from_json(JSON.generate(data)).tap do |doc|
         doc.source_dialect = dialect
