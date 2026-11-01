@@ -67,15 +67,22 @@ dir = Dir.mktmpdir("axe-audit")
 document = Lutaml::Openapi.parse(File.read(DOCUMENT))
 File.write(File.join(dir, "index.html"), Lutaml::Openapi::Spa.generate(document))
 
-page = File.join(dir, "index.html")
-File.write(File.join(dir, "audit.html"),
-           File.read(page).sub("</body>", "#{INJECT}\n</body>"))
+# an empty document must boot and stay accessible too: a JS crash on
+# missing sections would otherwise ship and only surface in production
+empty = Lutaml::Openapi.parse("{}")
+File.write(File.join(dir, "empty.html"), Lutaml::Openapi::Spa.generate(empty))
 
-# both locales gate: the default LTR render and the Arabic RTL render
-# (the mirrored layout must stay accessible)
+File.write(File.join(dir, "audit.html"),
+           File.read(File.join(dir, "index.html")).sub("</body>", "#{INJECT}\n</body>"))
+File.write(File.join(dir, "audit-empty.html"),
+           File.read(File.join(dir, "empty.html")).sub("</body>", "#{INJECT}\n</body>"))
+
+# gate matrix: both locales on the real document (the mirrored layout
+# must stay accessible), plus the empty document in the default locale
 VARIANTS = [
-  { label: "en", query: "" },
-  { label: "ar (rtl)", query: "?locale=ar" },
+  { label: "en", page: "audit.html", query: "" },
+  { label: "ar (rtl)", page: "audit.html", query: "?locale=ar" },
+  { label: "empty doc", page: "audit-empty.html", query: "" },
 ].freeze
 
 failed = false
@@ -83,7 +90,7 @@ failed = false
 VARIANTS.each do |variant|
   dom, err, status = Open3.capture3(
     chrome, "--headless=new", "--disable-gpu", "--virtual-time-budget=20000",
-    "--dump-dom", "file://#{File.join(dir, 'audit.html')}#{variant[:query]}"
+    "--dump-dom", "file://#{File.join(dir, variant[:page])}#{variant[:query]}"
   )
   abort "axe audit: Chrome failed: #{err[0, 400]}" unless status.success?
 
