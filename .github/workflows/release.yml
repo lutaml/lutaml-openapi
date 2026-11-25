@@ -2,10 +2,16 @@
 # registered against THIS repository's release.yml, so the OIDC credential
 # exchange has to run from here — a call into metanorma/ci's reusable
 # workflow carries metanorma/ci's job_workflow_ref and can never match.
+#
+# The version bump lands through a release pull request: main is protected
+# against direct pushes, and events created by the repository's own
+# GITHUB_TOKEN never trigger this workflow, so the run enables auto-merge,
+# waits for the merge, and publishes from the merge commit in the same run.
 name: release
 
 permissions:
   contents: write
+  pull-requests: write
   id-token: write
 
 on:
@@ -35,22 +41,81 @@ jobs:
       - name: Build SPA dist (packaged only at release time)
         run: cd frontend && npm install --package-lock-only && npm ci && npm run build && git checkout -- package-lock.json
 
-      - name: Bump version
+      - name: Resolve the next version
+        id: next
         if: inputs.next_version != 'skip'
         env:
           NEXT: ${{ inputs.next_version }}
         run: |
           set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           gemspec=$(ls -- *.gemspec | head -n1)
           vf=$(ruby -Ilib -e 's = Gem::Specification.load(ARGV[0]); f = s.files.grep(%r{(^|/)version\.rb\z}).find { |x| File.read(x) =~ /^\s*VERSION\s*=/ }; abort "version file not found" unless f; puts f' "$gemspec")
           next=$(ruby -e 'seg = ARGV[1]; abort "unsupported next_version #{seg}" unless %w[major minor patch].include?(seg) || seg =~ /\A\d+\.\d+\.\d+\z/; cur = File.read(ARGV[0])[/VERSION\s*=\s*"([^"]+)"/, 1] or abort "cannot read VERSION"; p = cur.split(".").map(&:to_i); puts(seg == "major" ? "#{p[0] + 1}.0.0" : seg == "minor" ? "#{p[0]}.#{p[1] + 1}.0" : seg == "patch" ? "#{p[0]}.#{p[1]}.#{p[2] + 1}" : seg)' "$vf" "$NEXT")
-          gem bump --file "$vf" --version "$next" --no-commit
+          name=$(ruby -e 'puts Gem::Specification.load(ARGV[0]).name' "$gemspec")
+          max_published=$(gem list -r --exact "$name" | ruby -e 'line = STDIN.read; m = line[/\(([^)]*)\)/, 1]; puts m.split(", ").map { |v| Gem::Version.new(v) }.max if m && !m.empty?')
+          if [ -n "$max_published" ]; then
+            ruby -e 'abort "refusing to release #{ARGV[0]}: not above the published maximum #{ARGV[1]}" if Gem::Version.new(ARGV[0]) <= Gem::Version.new(ARGV[1])' "$next" "$max_published"
+          fi
+          echo "version=${next}" >> "$GITHUB_OUTPUT"
+
+      - name: Bump the version on a release branch
+        if: inputs.next_version != 'skip'
+        env:
+          NEXT_VERSION: ${{ steps.next.outputs.version }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          vf=$(ruby -Ilib -e 's = Gem::Specification.load(ARGV[0]); f = s.files.grep(%r{(^|/)version\.rb\z}).find { |x| File.read(x) =~ /^\s*VERSION\s*=/ }; abort "version file not found" unless f; puts f' "$(ls -- *.gemspec | head -n1)")
+          gem bump --file "$vf" --version "${NEXT_VERSION}" --no-commit
           git add "$vf"
-          git commit -m "Bump version to ${next}"
-          git push origin "HEAD:main"
-          echo "NEXT=${next}" >> "$GITHUB_ENV"
+          git commit -m "Bump version to ${NEXT_VERSION}"
+          git push origin "HEAD:release/v${NEXT_VERSION}"
+
+      - name: Open the release pull request and enable auto-merge
+        if: inputs.next_version != 'skip'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NEXT_VERSION: ${{ steps.next.outputs.version }}
+        run: |
+          gh pr create --base main --head "release/v${NEXT_VERSION}" \
+            --title "Release lutaml-openapi ${NEXT_VERSION}" \
+            --body "Release train: version bump to ${NEXT_VERSION}. The dispatching run publishes from the merge commit."
+          gh pr merge --auto --rebase "release/v${NEXT_VERSION}" 2> /tmp/automerge-err.txt || {
+            cat /tmp/automerge-err.txt >&2 || true
+            echo "::warning title=Auto-merge unavailable::Merge the release PR manually; this run waits for the merge and publishes from it."
+          }
+
+      - name: Wait for the release PR to merge
+        if: inputs.next_version != 'skip'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NEXT_VERSION: ${{ steps.next.outputs.version }}
+        run: |
+          set -euo pipefail
+          echo "Waiting for the release PR to merge (max 20 minutes)..."
+          merged="false"
+          for i in $(seq 1 60); do
+            state=$(gh pr view "release/v${NEXT_VERSION}" --json state,mergedAt 2> /dev/null || true)
+            if printf '%s' "$state" | jq -e '.state == "MERGED" and .mergedAt != null' > /dev/null 2>&1; then
+              merged="true"
+              break
+            fi
+            sleep 20
+          done
+          if [ "$merged" != "true" ]; then
+            echo "::error::The release PR did not merge within 20 minutes. Merge it once its checks are green, then dispatch next_version=skip to publish from main."
+            exit 1
+          fi
+
+      - name: Check out the release commit
+        if: inputs.next_version != 'skip'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NEXT_VERSION: ${{ steps.next.outputs.version }}
+        run: |
+          sha=$(gh pr view "release/v${NEXT_VERSION}" --json mergeCommit --jq .mergeCommit.oid)
+          git checkout --force "$sha"
 
       - name: Configure RubyGems credentials via Trusted Publishing
         uses: rubygems/configure-rubygems-credentials@v2.1.0
@@ -61,9 +126,9 @@ jobs:
           gemspec=$(ls -- *.gemspec | head -n1)
           gem build "$gemspec"
           gemfile=$(ls -- *.gem | head -n1)
-          name=$(ruby -e 'puts Gem::Specification.load(ARGV[0]).name' "$(ls -- *.gemspec | head -n1)")
-          ver=$(ruby -e 'puts Gem::Specification.load(ARGV[0]).version' "$(ls -- *.gemspec | head -n1)")
-          if gem list -r -e "^${name}$" | grep -q "(\\(${ver}\\))"; then
+          name=$(ruby -e 'puts Gem::Specification.load(ARGV[0]).name' "$gemspec")
+          ver=$(ruby -e 'puts Gem::Specification.load(ARGV[0]).version' "$gemspec")
+          if gem list -r --exact "$name" --version "$ver" | grep -q "$name"; then
             echo "::warning::${name} ${ver} is already on rubygems.org; skipping push"
           else
             gem push "$gemfile"
