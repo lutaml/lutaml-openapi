@@ -115,6 +115,9 @@ jobs:
           NEXT_VERSION: ${{ steps.next.outputs.version }}
         run: |
           sha=$(gh pr view "release/v${NEXT_VERSION}" --json mergeCommit --jq .mergeCommit.oid)
+          # the runner's shallow clone predates the merge; fetch the merge
+          # commit explicitly or checkout dies with "unable to read tree"
+          git fetch --quiet origin "$sha"
           git checkout --force "$sha"
 
       - name: Configure RubyGems credentials via Trusted Publishing
